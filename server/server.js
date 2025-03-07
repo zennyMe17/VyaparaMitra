@@ -10,9 +10,10 @@ const corsOptions = {
   origin: 'https://vyapara-mitra.vercel.app', // Your frontend hosted URL
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 
-// Use CORS middleware
+// Use CORS middleware with the configured options
 app.use(cors(corsOptions));
 
 // Middleware to parse JSON request body
