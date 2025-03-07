@@ -1,85 +1,77 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState } from 'react';
+import axios from 'axios';
 
 function App() {
-  const [incomeProof, setIncomeProof] = useState("");
-  const [repaymentData, setRepaymentData] = useState("");
+  const [incomeProof, setIncomeProof] = useState('');
+  const [repaymentData, setRepaymentData] = useState('');
   const [creditScore, setCreditScore] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const handleIncomeProofChange = (e) => setIncomeProof(e.target.value);
-  const handleRepaymentDataChange = (e) => setRepaymentData(e.target.value);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
+    // Ensure both fields are filled
     if (!incomeProof || !repaymentData) {
-      setErrorMessage("Both fields are required.");
+      setError('Both income proof and repayment data are required');
       return;
     }
 
     try {
-      // Send the form data to your backend server
-      const response = await axios.post("http://localhost:5000/api/evaluate", {
+      // Send data to the backend API
+      const response = await axios.post('https://vyapara-mitra-iyd6.vercel.app/api/evaluate', {
         incomeProof,
         repaymentData,
       });
 
-      // Assuming the backend returns a credit score or evaluation result
+      // Set credit score from the response
       setCreditScore(response.data.creditScore);
-      setErrorMessage("");
-    } catch (error) {
-      console.error("Error evaluating creditworthiness:", error);
-      setErrorMessage("Error evaluating creditworthiness. Please try again.");
+      setError(''); // Clear previous errors
+    } catch (err) {
+      setError('Error occurred while evaluating creditworthiness.');
+      console.error(err);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
-      <div className="w-full max-w-md p-8 space-y-4 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-center text-gray-800">Evaluate Creditworthiness</h2>
-        
-        {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="incomeProof" className="block text-sm font-medium text-gray-700">Income Proof</label>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-md shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-4">Creditworthiness Evaluation</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="incomeProof" className="block text-sm font-semibold text-gray-700">Income Proof</label>
             <input
               type="text"
               id="incomeProof"
               value={incomeProof}
-              onChange={handleIncomeProofChange}
-              className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setIncomeProof(e.target.value)}
+              className="w-full px-4 py-2 mt-2 border rounded-md"
               placeholder="Enter income proof"
             />
           </div>
 
-          <div>
-            <label htmlFor="repaymentData" className="block text-sm font-medium text-gray-700">Repayment Data</label>
+          <div className="mb-4">
+            <label htmlFor="repaymentData" className="block text-sm font-semibold text-gray-700">Repayment Data</label>
             <input
               type="text"
               id="repaymentData"
               value={repaymentData}
-              onChange={handleRepaymentDataChange}
-              className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setRepaymentData(e.target.value)}
+              className="w-full px-4 py-2 mt-2 border rounded-md"
               placeholder="Enter repayment data"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
-            Submit
+            Evaluate
           </button>
         </form>
 
+        {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
         {creditScore !== null && (
-          <div className="mt-4 text-center">
-            <h3 className="text-lg font-semibold">Creditworthiness Evaluation Result</h3>
-            <p className="text-xl font-bold text-green-600">Credit Score: {creditScore}</p>
-          </div>
+          <p className="mt-4 text-green-500 text-lg font-semibold">Credit Score: {creditScore}</p>
         )}
       </div>
     </div>
